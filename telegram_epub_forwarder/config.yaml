@@ -2,6 +2,7 @@ name: "Telegram EPUB Forwarder"
 description: "Überwacht Telegram Channels auf .epub Dateien und leitet sie per Gmail weiter"
 version: "1.0.0"
 slug: telegram_epub_forwarder
+url: "https://github.com/dimixyzc/telegram_epub_forwarder_addon/tree/main/telegram_epub_forwarder"
 init: false
 arch:
   - aarch64
