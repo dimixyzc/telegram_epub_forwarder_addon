@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 API_ID = int(os.environ["TG_API_ID"])
 API_HASH = os.environ["TG_API_HASH"]
 PHONE = os.environ["TG_PHONE"]
-SESSION_STRING = os.environ.get("TG_SESSION_STRING", "").strip()
+SESSION_STRING = os.environ.get("TG_SESSION_STRING", "")
 CHANNELS = [c.strip() for c in os.environ["CHANNELS"].split(",")]
 GMAIL_USER = os.environ["GMAIL_USER"]
 GMAIL_PASS = os.environ["GMAIL_PASS"]
@@ -52,6 +52,38 @@ def wait_for_code():
             log.info("Code gelesen. Anmeldung läuft...")
             return code
         time.sleep(2)
+
+
+def normalize_session_string(session_string: str) -> str:
+    session_string = "".join(session_string.split())
+    if (
+        len(session_string) >= 2
+        and session_string[0] == session_string[-1]
+        and session_string[0] in {"'", '"'}
+    ):
+        session_string = session_string[1:-1]
+    return session_string
+
+
+def build_telegram_client() -> TelegramClient:
+    session_string = normalize_session_string(SESSION_STRING)
+    if not session_string:
+        log.info(f"Keine Telegram StringSession konfiguriert. Nutze Datei-Session: {SESSION_PATH}")
+        return TelegramClient(SESSION_PATH, API_ID, API_HASH)
+
+    try:
+        session = StringSession(session_string)
+    except Exception as exc:
+        log.critical(
+            "Telegram Session String ist ungueltig oder nicht im Telethon-Format. "
+            "Bitte einen Telethon StringSession-Wert eintragen oder das Feld leer lassen, "
+            f"um den Datei-Login zu nutzen. Laenge nach Bereinigung: {len(session_string)}. "
+            f"Fehler: {exc}"
+        )
+        raise SystemExit(2) from exc
+
+    log.info("Telegram StringSession konfiguriert.")
+    return TelegramClient(session, API_ID, API_HASH)
 
 
 def size_mb(file_bytes: bytes) -> float:
@@ -225,12 +257,11 @@ def process_epub_for_kindle(filename: str, file_bytes: bytes):
 
 
 async def main():
-    if SESSION_STRING:
-        client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
+    client = build_telegram_client()
+    if normalize_session_string(SESSION_STRING):
         await client.start()
         log.info("Telegram StringSession geladen.")
     else:
-        client = TelegramClient(SESSION_PATH, API_ID, API_HASH)
         await client.start(phone=PHONE, code_callback=wait_for_code)
         log.info(f"Telegram Datei-Session geladen: {SESSION_PATH}")
 
