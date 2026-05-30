@@ -1,0 +1,34 @@
+name: "Telegram EPUB Forwarder"
+description: "Überwacht Telegram Channels auf .epub Dateien und leitet sie per Gmail weiter"
+version: "1.0.0"
+slug: telegram_epub_forwarder
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armv7
+options:
+  telegram_api_id: 0
+  telegram_api_hash: ""
+  telegram_phone: ""
+  channels:
+    - "te_sync"
+    - "economistenglish"
+  gmail_user: ""
+  gmail_app_password: ""
+  recipient_email: ""
+  max_epub_mb: 18
+  notification_email: ""
+  keep_oversized_files: true
+schema:
+  telegram_api_id: int
+  telegram_api_hash: str
+  telegram_phone: str
+  channels:
+    - str
+  gmail_user: str
+  gmail_app_password: str
+  recipient_email: str
+  max_epub_mb: float
+  notification_email: str
+  keep_oversized_files: bool
