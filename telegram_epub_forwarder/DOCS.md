@@ -4,7 +4,8 @@
 
 - `telegram_api_id`: Telegram API ID.
 - `telegram_api_hash`: Telegram API hash.
-- `telegram_phone`: Telegram phone number.
+- `telegram_phone`: Telegram phone number. Only needed for fallback login if no session string is configured.
+- `telegram_session_string`: Existing Telethon session string. Preferred for Home Assistant use.
 - `channels`: Telegram channel usernames or IDs to watch.
 - `gmail_user`: Gmail sender address.
 - `gmail_app_password`: Gmail app password.

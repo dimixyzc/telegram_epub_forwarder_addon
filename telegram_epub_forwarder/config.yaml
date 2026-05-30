@@ -12,6 +12,7 @@ options:
   telegram_api_id: 0
   telegram_api_hash: ""
   telegram_phone: ""
+  telegram_session_string: ""
   channels:
     - "te_sync"
     - "economistenglish"
@@ -25,6 +26,7 @@ schema:
   telegram_api_id: int
   telegram_api_hash: str
   telegram_phone: str
+  telegram_session_string: str
   channels:
     - str
   gmail_user: str

@@ -4,6 +4,7 @@ CONFIG_PATH=/data/options.json
 export TG_API_ID=$(jq -r '.telegram_api_id' $CONFIG_PATH)
 export TG_API_HASH=$(jq -r '.telegram_api_hash' $CONFIG_PATH)
 export TG_PHONE=$(jq -r '.telegram_phone' $CONFIG_PATH)
+export TG_SESSION_STRING=$(jq -r '.telegram_session_string // ""' $CONFIG_PATH)
 export CHANNELS=$(jq -r '.channels | join(",")' $CONFIG_PATH)
 export GMAIL_USER=$(jq -r '.gmail_user' $CONFIG_PATH)
 export GMAIL_PASS=$(jq -r '.gmail_app_password' $CONFIG_PATH)

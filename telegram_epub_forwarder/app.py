@@ -9,6 +9,7 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email import encoders
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 from PIL import Image
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -17,6 +18,7 @@ log = logging.getLogger(__name__)
 API_ID = int(os.environ["TG_API_ID"])
 API_HASH = os.environ["TG_API_HASH"]
 PHONE = os.environ["TG_PHONE"]
+SESSION_STRING = os.environ.get("TG_SESSION_STRING", "").strip()
 CHANNELS = [c.strip() for c in os.environ["CHANNELS"].split(",")]
 GMAIL_USER = os.environ["GMAIL_USER"]
 GMAIL_PASS = os.environ["GMAIL_PASS"]
@@ -40,7 +42,7 @@ def wait_for_code():
     log.info("EINMALIGE ANMELDUNG ERFORDERLICH")
     log.info("Telegram schickt dir jetzt einen Code.")
     log.info("Gib ihn im SSH Terminal ein mit:")
-    log.info("  echo '12345' > /addon_configs/local_telegram_epub_forwarder/auth_code.txt")
+    log.info(f"  echo '12345' > {AUTH_CODE_FILE}")
     log.info("=" * 60)
     while True:
         if os.path.exists(AUTH_CODE_FILE):
@@ -223,8 +225,15 @@ def process_epub_for_kindle(filename: str, file_bytes: bytes):
 
 
 async def main():
-    client = TelegramClient(SESSION_PATH, API_ID, API_HASH)
-    await client.start(phone=PHONE, code_callback=wait_for_code)
+    if SESSION_STRING:
+        client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
+        await client.start()
+        log.info("Telegram StringSession geladen.")
+    else:
+        client = TelegramClient(SESSION_PATH, API_ID, API_HASH)
+        await client.start(phone=PHONE, code_callback=wait_for_code)
+        log.info(f"Telegram Datei-Session geladen: {SESSION_PATH}")
+
     log.info(f"Verbunden als {PHONE}. Überwache Channels: {CHANNELS}")
 
     @client.on(events.NewMessage(chats=CHANNELS))
